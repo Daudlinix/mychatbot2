@@ -2,7 +2,9 @@ from flask import Flask, render_template, request, jsonify
 import requests
 from bs4 import BeautifulSoup
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 
 # 🔍 Pages to scrape
@@ -24,10 +26,10 @@ def scrape_travel_site():
             text = soup.get_text(separator="\n", strip=True)
             all_data += f"\n\nPAGE: {url}\n{text}"
         except Exception as e:
-            all_data += f"\n\nPAGE: {url}\nError: {str(e)}"
+            all_data += f"\n\nPAGE: {url}\nError: Page could not be fetched"
     return all_data
 
-# 🔄 Scrape once when app starts
+# 🔄 Scrape once at app start
 try:
     travel_site_data = scrape_travel_site()
 except Exception as e:
@@ -51,15 +53,14 @@ def get_bot_response():
     """
 
     headers = {
-        # 🛑🔑 INSERT YOUR OPENROUTER API KEY HERE:
-        "Authorization": "Bearer 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",  # 👈 👈 👈 Replace here!
+        "Authorization": f"Bearer {os.environ.get('OPENROUTER_KEY')}",
         "Content-Type": "application/json"
     }
 
     payload = {
         "model": "mistralai/mistral-7b-instruct",
         "messages": [
-            {"role": "system", "content": "You're a helpful travel AI. Keep it short."},
+            {"role": "system", "content": "You're a helpful travel AI. Be short."},
             {"role": "user", "content": prompt}
         ]
     }
