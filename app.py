@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # 🔍 Pages to scrape
 travel_pages = [
-    "https://redstartravels.co/services",
+    "https://www.redstartravels.co/services/",
     "https://redstartravels.co/about",
     "https://redstartravels.co/contact",
     "https://redstartravels.co/packages"
