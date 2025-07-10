@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Khan Chatbot</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; }
+    #chat-icon {
+      position: fixed; bottom: 25px; right: 25px;
+      background: linear-gradient(135deg, #FF416C, #FF4B2B);
+      color: white; border-radius: 50%; width: 60px; height: 60px;
+      font-size: 28px; line-height: 60px; text-align: center;
+      cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      z-index: 9999;
+    }
+    #chat-container {
+      display: none; position: fixed; bottom: 100px; right: 25px;
+      width: 350px; height: 480px; background: #fff;
+      border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      overflow: hidden; flex-direction: column; display: flex;
+    }
+    #chat-header {
+      background: linear-gradient(135deg, #FF416C, #FF4B2B);
+      color: white; padding: 16px; text-align: center;
+      font-size: 16px; font-weight: bold;
+    }
+    #chatbox {
+      flex: 1; padding: 12px; overflow-y: auto;
+      background-color: #fafafa; font-size: 14px;
+    }
+    .message { margin: 8px 0; }
+    .user { color: #333; font-weight: bold; }
+    .bot { color: #009688; font-weight: bold; }
+    #userInput {
+      border: none; border-top: 1px solid #ddd; padding: 12px;
+      font-size: 14px; width: 100%; box-sizing: border-box; outline: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="chat-icon">💬</div>
+
+<div id="chat-container">
+  <div id="chat-header">Hi there 👋<br><small>Ask me anything</small></div>
+  <div id="chatbox"></div>
+  <input id="userInput" type="text" placeholder="Type your message..." />
+</div>
+
+<script>
+  const chatIcon = document.getElementById("chat-icon");
+  const chatContainer = document.getElementById("chat-container");
+  const input = document.getElementById("userInput");
+  const chatbox = document.getElementById("chatbox");
+
+  chatIcon.onclick = () => {
+    chatContainer.style.display = chatContainer.style.display === "none" ? "flex" : "none";
+  };
+
+  input.addEventListener("keypress", function (e) {
+    if (e.key === "Enter" && input.value.trim() !== "") {
+      const msg = input.value;
+      chatbox.innerHTML += `<div class="message"><span class="user">You:</span> ${msg}</div>`;
+      input.value = "";
+      fetch(`/get?msg=${encodeURIComponent(msg)}`)
+        .then(res => res.json())
+        .then(data => {
+          chatbox.innerHTML += `<div class="message"><span class="bot">Bot:</span> ${data.reply}</div>`;
+          chatbox.scrollTop = chatbox.scrollHeight;
+        });
+    }
+  });
+</script>
+
+</body>
+</html>
