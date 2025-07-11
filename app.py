@@ -1,39 +1,16 @@
 from flask import Flask, render_template, request, jsonify
 import requests
-from bs4 import BeautifulSoup
 import os
 from dotenv import load_dotenv
 
+# 🔑 Load environment variables (like API key)
 load_dotenv()
+
 app = Flask(__name__)
 
-# 🔍 Pages to scrape
-travel_pages = [
-    "https://www.redstartravels.co/services/",
-    "https://redstartravels.co/about",
-    "https://redstartravels.co/contact",
-    "https://redstartravels.co/packages"
-]
-
-# 🌐 Scrape travel site
-def scrape_travel_site():
-    all_data = ""
-    headers = {"User-Agent": "Mozilla/5.0"}
-    for url in travel_pages:
-        try:
-            res = requests.get(url, headers=headers, timeout=10)
-            soup = BeautifulSoup(res.text, "html.parser")
-            text = soup.get_text(separator="\n", strip=True)
-            all_data += f"\n\nPAGE: {url}\n{text}"
-        except Exception as e:
-            all_data += f"\n\nPAGE: {url}\nError: Page could not be fetched"
-    return all_data
-
-# 🔄 Scrape once at app start
-try:
-    travel_site_data = scrape_travel_site()
-except Exception as e:
-    travel_site_data = "Scraping error: " + str(e)
+# 📄 Load travel site data from file (scraped offline)
+with open("travel_data.txt", "r", encoding="utf-8") as f:
+    travel_site_data = f.read()
 
 @app.route("/")
 def home():
@@ -53,7 +30,7 @@ def get_bot_response():
     """
 
     headers = {
-        "Authorization": f"Bearer {os.environ.get('OPENROUTER_KEY')}",
+        "Authorization": f"Bearer {os.environ.get('OPENROUTER_KEY')}",  # 👈 .env ya Railway variable
         "Content-Type": "application/json"
     }
 
@@ -74,5 +51,5 @@ def get_bot_response():
         return jsonify(reply=f"Error: {str(e)}")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))  # ✅ Railway ke environment se port lo
+    port = int(os.environ.get("PORT", 8080))  # ✅ Railway ke port
     app.run(debug=True, host="0.0.0.0", port=port)
