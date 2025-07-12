@@ -132,9 +132,20 @@
       const msg = input.value;
       appendMessage("user", msg);
       input.value = "";
+
+      // ⏳ Show typing...
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "message bot";
+      typingDiv.id = "typing";
+      typingDiv.innerHTML = `<strong>Bot:</strong> <em>Typing...</em>`;
+      chatbox.appendChild(typingDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
+          const typing = document.getElementById("typing");
+          if (typing) typing.remove(); // ❌ Remove typing
           appendMessage("bot", data.reply);
         });
     }
