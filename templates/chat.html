@@ -4,42 +4,89 @@
   <meta charset="UTF-8" />
   <title>RED STAR BOT</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+    }
     #chat-icon {
-      position: fixed; bottom: 25px; right: 25px;
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
-      color: white; border-radius: 50%; width: 60px; height: 60px;
-      font-size: 28px; line-height: 60px; text-align: center;
-      cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 28px;
+      line-height: 60px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
       z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+    #chat-icon:hover {
+      transform: scale(1.1);
     }
     #chat-container {
-      display: none; position: fixed; bottom: 100px; right: 25px;
-      width: 350px; height: 480px; background: #fff;
-      border-radius: 15px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      overflow: hidden; flex-direction: column; display: flex;
+      position: fixed;
+      bottom: 100px;
+      right: 25px;
+      width: 350px;
+      height: 480px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      overflow: hidden;
+      flex-direction: column;
+      display: none;
+      animation: slideUp 0.3s ease forwards;
+      z-index: 9998;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
-      color: white; padding: 16px; text-align: center;
-      font-size: 16px; font-weight: bold;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
     }
     #chatbox {
-      flex: 1; padding: 12px; overflow-y: auto;
-      background-color: #fafafa; font-size: 14px;
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      background-color: #fafafa;
+      font-size: 14px;
     }
-    .message { margin: 8px 0; }
-    .user { color: #333; font-weight: bold; }
-    .bot { color: #009688; font-weight: bold; }
+    .message {
+      margin: 8px 0;
+    }
+    .user {
+      color: #333;
+      font-weight: bold;
+    }
+    .bot {
+      color: #009688;
+      font-weight: bold;
+    }
     #userInput {
-      border: none; border-top: 1px solid #ddd; padding: 12px;
-      font-size: 14px; width: 100%; box-sizing: border-box; outline: none;
+      border: none;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      font-size: 14px;
+      width: 100%;
+      box-sizing: border-box;
+      outline: none;
     }
   </style>
 </head>
 <body>
 
-<div id="chat-icon">💬</div>
+<div id="chat-icon" title="Chat with us">💬</div>
 
 <div id="chat-container">
   <div id="chat-header">Hi there 👋<br><small>Ask me anything</small></div>
@@ -53,8 +100,11 @@
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
 
+  let isOpen = false;
+
   chatIcon.onclick = () => {
-    chatContainer.style.display = chatContainer.style.display === "none" ? "flex" : "none";
+    isOpen = !isOpen;
+    chatContainer.style.display = isOpen ? "flex" : "none";
   };
 
   input.addEventListener("keypress", function (e) {
