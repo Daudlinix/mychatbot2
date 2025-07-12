@@ -18,8 +18,14 @@ def home():
 
 @app.route("/get")
 def get_bot_response():
-    user_input = request.args.get("msg")
+    user_input = request.args.get("msg").lower().strip()
 
+    # 👋 Greeting Handling
+    greetings = ["hi", "hello", "hey", "hi there", "hello there"]
+    if user_input in greetings:
+        return jsonify(reply="Hi there! 👋 Do you want any help regarding travel?")
+
+    # ✨ Main Prompt
     prompt = f"""
     You are a helpful travel assistant. Answer in 1 short line.
 
@@ -30,7 +36,7 @@ def get_bot_response():
     """
 
     headers = {
-        "Authorization": f"Bearer {os.environ.get('OPENROUTER_KEY')}",  # 👈 .env ya Railway variable
+        "Authorization": f"Bearer {os.environ.get('OPENROUTER_KEY')}",
         "Content-Type": "application/json"
     }
 
