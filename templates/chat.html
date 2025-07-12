@@ -8,8 +8,7 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #ffffff;
-      -webkit-font-smoothing: antialiased;
+      background: #f5f5f5;
     }
 
     #chat-icon {
@@ -38,8 +37,8 @@
       position: fixed;
       bottom: 100px;
       right: 25px;
-      width: 90%;
-      max-width: 360px;
+      width: 350px;
+      max-width: 95%;
       height: 500px;
       background: #fff;
       border-radius: 15px;
@@ -57,26 +56,26 @@
     }
 
     #chat-header {
-      background: #ffffff;
-      color: #000;
-      padding: 10px;
+      background: linear-gradient(135deg, #FF416C, #FF4B2B);
+      color: white;
+      padding: 10px 10px 6px 10px;
       text-align: center;
       font-size: 16px;
       font-weight: bold;
-      border-bottom: 1px solid #ddd;
+    }
+
+    #logo-wrap {
+      background: white;
+      padding: 6px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      display: inline-block;
     }
 
     #logo {
-      width: 100px;
-      height: auto;
-      margin: 0 auto 10px;
+      height: 40px;
       display: block;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      margin: auto;
     }
 
     #chatbox {
@@ -126,7 +125,9 @@
 
 <div id="chat-container">
   <div id="chat-header">
-    <img id="logo" src="https://yourdomain.com/path-to-logo.png" alt="Red Star Logo" />
+    <div id="logo-wrap">
+      <img id="logo" src="https://www.redstartravels.co/wp-content/uploads/2024/09/red-star-logo-1536x852.png" alt="Red Star Logo">
+    </div>
     Hi there 👋<br><small>Ask me anything</small>
   </div>
   <div id="chatbox"></div>
@@ -154,7 +155,7 @@
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          removeLastBotTyping(); // remove "Bot is typing..."
+          removeLastBotTyping();
           appendMessage("bot", data.reply);
         });
     }
