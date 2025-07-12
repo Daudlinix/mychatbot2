@@ -7,7 +7,11 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      background: #f5f5f5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
     #chat-icon {
       position: fixed;
       bottom: 25px;
@@ -25,9 +29,11 @@
       z-index: 9999;
       transition: transform 0.3s ease;
     }
+
     #chat-icon:hover {
       transform: scale(1.1);
     }
+
     #chat-container {
       position: fixed;
       bottom: 100px;
@@ -38,15 +44,17 @@
       border-radius: 15px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       overflow: hidden;
-      flex-direction: column;
       display: none;
+      flex-direction: column;
       animation: slideUp 0.3s ease forwards;
       z-index: 9998;
     }
+
     @keyframes slideUp {
       from { transform: translateY(30px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
@@ -55,24 +63,37 @@
       font-size: 16px;
       font-weight: bold;
     }
+
     #chatbox {
       flex: 1;
       padding: 12px;
       overflow-y: auto;
       background-color: #fafafa;
       font-size: 14px;
+      display: flex;
+      flex-direction: column;
     }
+
     .message {
-      margin: 8px 0;
+      margin: 6px 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      max-width: 80%;
+      word-wrap: break-word;
     }
+
     .user {
-      color: #333;
-      font-weight: bold;
+      align-self: flex-end;
+      background: #FF416C;
+      color: white;
     }
+
     .bot {
-      color: #009688;
-      font-weight: bold;
+      align-self: flex-start;
+      background: #f1f1f1;
+      color: #333;
     }
+
     #userInput {
       border: none;
       border-top: 1px solid #ddd;
@@ -99,7 +120,6 @@
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
-
   let isOpen = false;
 
   chatIcon.onclick = () => {
@@ -110,16 +130,23 @@
   input.addEventListener("keypress", function (e) {
     if (e.key === "Enter" && input.value.trim() !== "") {
       const msg = input.value;
-      chatbox.innerHTML += `<div class="message"><span class="user">You:</span> ${msg}</div>`;
+      appendMessage("user", msg);
       input.value = "";
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          chatbox.innerHTML += `<div class="message"><span class="bot">Bot:</span> ${data.reply}</div>`;
-          chatbox.scrollTop = chatbox.scrollHeight;
+          appendMessage("bot", data.reply);
         });
     }
   });
+
+  function appendMessage(role, text) {
+    const div = document.createElement("div");
+    div.className = `message ${role}`;
+    div.innerHTML = `<strong>${role === "user" ? "You" : "Bot"}:</strong> ${text}`;
+    chatbox.appendChild(div);
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
 </script>
 
 </body>
