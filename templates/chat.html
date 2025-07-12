@@ -2,17 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RED STAR BOT</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #f5f5f5;
+      background: #ffffff;
+      -webkit-font-smoothing: antialiased;
     }
 
     #chat-icon {
@@ -39,15 +36,15 @@
 
     #chat-container {
       position: fixed;
-      bottom: 80px;
+      bottom: 100px;
       right: 25px;
-      width: 350px;
-      max-width: 95vw;
+      width: 90%;
+      max-width: 360px;
       height: 500px;
-      max-height: 80vh;
       background: #fff;
       border-radius: 15px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      overflow: hidden;
       display: none;
       flex-direction: column;
       animation: slideUp 0.3s ease forwards;
@@ -60,20 +57,26 @@
     }
 
     #chat-header {
-      background: linear-gradient(135deg, #FF416C, #FF4B2B);
-      color: white;
-      padding: 14px;
+      background: #ffffff;
+      color: #000;
+      padding: 10px;
       text-align: center;
       font-size: 16px;
       font-weight: bold;
-      position: relative;
+      border-bottom: 1px solid #ddd;
     }
 
-    #chat-header img {
-      height: 28px;
-      position: absolute;
-      top: 12px;
-      left: 12px;
+    #logo {
+      width: 100px;
+      height: auto;
+      margin: 0 auto 10px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     #chatbox {
@@ -106,47 +109,14 @@
       color: #333;
     }
 
-    .typing {
-      font-style: italic;
-      font-size: 13px;
-      color: gray;
-    }
-
     #userInput {
       border: none;
       border-top: 1px solid #ddd;
       padding: 12px;
       font-size: 14px;
       width: 100%;
+      box-sizing: border-box;
       outline: none;
-    }
-
-    @media screen and (max-width: 500px) {
-      #chat-container {
-        width: 95vw;
-        height: 90vh;
-        right: 10px;
-        bottom: 90px;
-      }
-
-      #chat-header {
-        font-size: 15px;
-        padding: 12px;
-      }
-
-      #chatbox {
-        font-size: 13px;
-      }
-
-      #userInput {
-        font-size: 13px;
-      }
-
-      #chat-icon {
-        width: 55px;
-        height: 55px;
-        font-size: 24px;
-      }
     }
   </style>
 </head>
@@ -156,8 +126,8 @@
 
 <div id="chat-container">
   <div id="chat-header">
-    <img src="https://www.redstartravels.co/wp-content/uploads/2024/09/red-star-logo-1536x852.png" alt="Logo" />
-    Red Star Assistant
+    <img id="logo" src="https://yourdomain.com/path-to-logo.png" alt="Red Star Logo" />
+    Hi there 👋<br><small>Ask me anything</small>
   </div>
   <div id="chatbox"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
@@ -180,18 +150,12 @@
       const msg = input.value;
       appendMessage("user", msg);
       input.value = "";
-
-      const typingIndicator = document.createElement("div");
-      typingIndicator.className = "typing";
-      typingIndicator.innerText = "Bot is typing...";
-      chatbox.appendChild(typingIndicator);
-      chatbox.scrollTop = chatbox.scrollHeight;
-
+      appendMessage("bot", "⏳ Bot is typing...");
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          chatbox.removeChild(typingIndicator);
-          appendMessage("bot", makeLinksClickable(data.reply));
+          removeLastBotTyping(); // remove "Bot is typing..."
+          appendMessage("bot", data.reply);
         });
     }
   });
@@ -204,8 +168,11 @@
     chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  function makeLinksClickable(text) {
-    return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#FF416C;text-decoration:underline;">$1</a>');
+  function removeLastBotTyping() {
+    const messages = document.querySelectorAll(".message.bot");
+    if (messages.length > 0 && messages[messages.length - 1].innerText.includes("Bot is typing")) {
+      messages[messages.length - 1].remove();
+    }
   }
 </script>
 
