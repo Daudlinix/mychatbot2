@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>RED STAR BOT</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       background: #f5f5f5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     #chat-icon {
@@ -38,8 +40,7 @@
       bottom: 100px;
       right: 25px;
       width: 350px;
-      max-width: 95%;
-      height: 500px;
+      height: 520px;
       background: #fff;
       border-radius: 15px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
@@ -58,24 +59,28 @@
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
-      padding: 10px 10px 6px 10px;
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
+      padding: 10px 16px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    #logo-wrap {
+    #chat-header img {
+      height: 32px;
+      width: auto;
       background: white;
-      padding: 6px;
-      border-radius: 10px;
-      margin-bottom: 5px;
-      display: inline-block;
+      border-radius: 6px;
+      padding: 3px;
     }
 
-    #logo {
-      height: 40px;
-      display: block;
-      margin: auto;
+    #chat-header-title {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chat-header-title strong {
+      font-size: 15px;
     }
 
     #chatbox {
@@ -125,10 +130,11 @@
 
 <div id="chat-container">
   <div id="chat-header">
-    <div id="logo-wrap">
-      <img id="logo" src="https://www.redstartravels.co/wp-content/uploads/2024/09/red-star-logo-1536x852.png" alt="Red Star Logo">
+    <img src="https://www.redstartravels.co/wp-content/uploads/2024/09/red-star-logo-1536x852.png" alt="Logo" />
+    <div id="chat-header-title">
+      <strong>Hi there 👋</strong>
+      <small>Ask me anything</small>
     </div>
-    Hi there 👋<br><small>Ask me anything</small>
   </div>
   <div id="chatbox"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
@@ -151,11 +157,11 @@
       const msg = input.value;
       appendMessage("user", msg);
       input.value = "";
-      appendMessage("bot", "⏳ Bot is typing...");
+      appendTyping();
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          removeLastBotTyping();
+          removeTyping();
           appendMessage("bot", data.reply);
         });
     }
@@ -169,11 +175,18 @@
     chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  function removeLastBotTyping() {
-    const messages = document.querySelectorAll(".message.bot");
-    if (messages.length > 0 && messages[messages.length - 1].innerText.includes("Bot is typing")) {
-      messages[messages.length - 1].remove();
-    }
+  function appendTyping() {
+    const typing = document.createElement("div");
+    typing.className = "message bot";
+    typing.id = "typing";
+    typing.innerHTML = `<strong>Bot:</strong> typing...`;
+    chatbox.appendChild(typing);
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById("typing");
+    if (typing) typing.remove();
   }
 </script>
 
