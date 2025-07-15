@@ -2,86 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>RED STAR BOT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RED STAR BOT</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
     }
 
-    /* Chat button */
     #chat-button-wrapper {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 25px;
+      right: 25px;
       z-index: 9999;
       display: flex;
       align-items: center;
       gap: 10px;
       background: white;
-      padding: 6px 12px;
+      padding: 8px 12px;
       border-radius: 40px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    #chat-button-wrapper:hover {
+      transform: scale(1.03);
     }
 
     #chat-icon {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      font-size: 20px;
+      width: 45px;
+      height: 45px;
+      font-size: 22px;
+      line-height: 45px;
       text-align: center;
-      line-height: 40px;
     }
 
     #chat-label {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
     }
 
-    /* Chat box */
     #chat-container {
       display: none;
       position: fixed;
-      bottom: 75px;
-      right: 20px;
-      width: 320px;
-      height: 400px;
+      bottom: 90px;
+      right: 25px;
+      width: 360px;
+      max-width: 95%;
+      height: 450px;
       background: white;
       border-radius: 15px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      flex-direction: column;
       overflow: hidden;
       z-index: 9998;
-      display: flex;
-      flex-direction: column;
     }
 
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
-      padding: 12px;
+      padding: 14px;
       text-align: center;
       font-weight: bold;
-      font-size: 15px;
+      font-size: 16px;
     }
 
     #chatbox {
       flex: 1;
-      padding: 10px;
+      padding: 12px;
+      background: #f9f9f9;
       overflow-y: auto;
       font-size: 14px;
-      background: #fafafa;
       display: flex;
       flex-direction: column;
     }
 
     .message {
       margin: 6px 0;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
       max-width: 80%;
       word-wrap: break-word;
     }
@@ -100,61 +103,46 @@
 
     #userInput {
       border: none;
-      border-top: 1px solid #ddd;
+      border-top: 1px solid #ccc;
       padding: 10px;
       font-size: 14px;
       width: 100%;
-      box-sizing: border-box;
       outline: none;
     }
 
-    /* Mobile friendly */
     @media (max-width: 480px) {
       #chat-container {
         width: 95%;
-        height: 80vh;
-        bottom: 75px;
+        height: 90vh;
+        bottom: 80px;
         right: 10px;
-      }
-
-      #chat-button-wrapper {
-        bottom: 15px;
-        right: 10px;
-        padding: 6px 10px;
-      }
-
-      #chat-icon {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-        line-height: 36px;
-      }
-
-      #chat-label {
-        font-size: 13px;
       }
     }
   </style>
 </head>
 <body>
 
-<!-- Chat Toggle Button -->
 <div id="chat-button-wrapper" onclick="toggleChat()">
   <div id="chat-label">CHAT 👋</div>
   <div id="chat-icon">💬</div>
 </div>
 
-<!-- Chat Window -->
 <div id="chat-container">
-  <div id="chat-header">RED STAR BOT<br><small>Ask your travel query</small></div>
+  <div id="chat-header">RED STAR TRAVEL<br><small>Ask your travel query</small></div>
   <div id="chatbox"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
 </div>
+
+<!-- Notification Sound -->
+<audio id="notifSound">
+  <source src="https://www.myinstants.com/media/sounds/pop-up-kun.mp3" type="audio/mpeg">
+</audio>
 
 <script>
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
+  const notifSound = document.getElementById("notifSound");
 
   function toggleChat() {
     chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
@@ -165,13 +153,14 @@
       const msg = input.value.trim();
       appendMessage("user", msg);
       input.value = "";
-      appendMessage("bot", "Typing...");
+      appendMessage("bot", "<em style='color:gray;'>Red Star is typing...</em>");
 
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          chatbox.lastChild.remove();
+          chatbox.lastChild.remove(); // remove "typing"
           appendMessage("bot", data.reply);
+          notifSound.play();
         });
     }
   });
@@ -179,7 +168,7 @@
   function appendMessage(role, text) {
     const div = document.createElement("div");
     div.className = `message ${role}`;
-    div.innerHTML = `<strong>${role === "user" ? "You" : "Bot"}:</strong> ${text}`;
+    div.innerHTML = `<strong>${role === "user" ? "You" : "Red Star"}:</strong> ${text}`;
     chatbox.appendChild(div);
     chatbox.scrollTop = chatbox.scrollHeight;
   }
