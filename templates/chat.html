@@ -40,7 +40,7 @@
       bottom: 100px;
       right: 25px;
       width: 350px;
-      height: 520px;
+      height: 480px;
       background: #fff;
       border-radius: 15px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
@@ -59,28 +59,21 @@
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
-      padding: 10px 16px;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 12px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: bold;
+      position: relative;
     }
 
     #chat-header img {
-      height: 32px;
-      width: auto;
+      height: 28px;
+      position: absolute;
+      top: 12px;
+      left: 12px;
       background: white;
       border-radius: 6px;
-      padding: 3px;
-    }
-
-    #chat-header-title {
-      display: flex;
-      flex-direction: column;
-    }
-
-    #chat-header-title strong {
-      font-size: 15px;
+      padding: 2px 4px;
     }
 
     #chatbox {
@@ -113,6 +106,13 @@
       color: #333;
     }
 
+    #typing {
+      font-style: italic;
+      color: gray;
+      font-size: 13px;
+      padding-left: 4px;
+    }
+
     #userInput {
       border: none;
       border-top: 1px solid #ddd;
@@ -122,21 +122,29 @@
       box-sizing: border-box;
       outline: none;
     }
+
+    @media screen and (max-width: 500px) {
+      #chat-container {
+        width: 90%;
+        right: 5%;
+        bottom: 90px;
+      }
+    }
   </style>
 </head>
 <body>
 
+<!-- Chat Icon -->
 <div id="chat-icon" title="Chat with us">💬</div>
 
+<!-- Chat Window -->
 <div id="chat-container">
   <div id="chat-header">
-    <img src="https://www.redstartravels.co/wp-content/uploads/2024/09/red-star-logo-1536x852.png" alt="Logo" />
-    <div id="chat-header-title">
-      <strong>Hi there 👋</strong>
-      <small>Ask me anything</small>
-    </div>
+    <img src="https://redstartravels.co/static/logo.png" alt="Logo" />
+    Hi there 👋<br><small>Ask me anything</small>
   </div>
   <div id="chatbox"></div>
+  <div id="typing"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
 </div>
 
@@ -145,6 +153,7 @@
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
+  const typing = document.getElementById("typing");
   let isOpen = false;
 
   chatIcon.onclick = () => {
@@ -157,12 +166,13 @@
       const msg = input.value;
       appendMessage("user", msg);
       input.value = "";
-      appendTyping();
+      typing.innerText = "Bot is typing...";
+
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          removeTyping();
-          appendMessage("bot", data.reply);
+          typing.innerText = "";
+          appendMessage("bot", makeLinksClickable(data.reply));
         });
     }
   });
@@ -175,18 +185,9 @@
     chatbox.scrollTop = chatbox.scrollHeight;
   }
 
-  function appendTyping() {
-    const typing = document.createElement("div");
-    typing.className = "message bot";
-    typing.id = "typing";
-    typing.innerHTML = `<strong>Bot:</strong> typing...`;
-    chatbox.appendChild(typing);
-    chatbox.scrollTop = chatbox.scrollHeight;
-  }
-
-  function removeTyping() {
-    const typing = document.getElementById("typing");
-    if (typing) typing.remove();
+  // Convert URLs in bot response to clickable links
+  function makeLinksClickable(text) {
+    return text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
   }
 </script>
 
