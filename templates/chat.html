@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RED STAR BOT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
     }
 
+    /* Floating chat button */
     #chat-button-wrapper {
       position: fixed;
       bottom: 25px;
@@ -46,6 +47,7 @@
       font-weight: 500;
     }
 
+    /* Chat container */
     #chat-container {
       display: none;
       position: fixed;
@@ -53,7 +55,7 @@
       right: 25px;
       width: 360px;
       max-width: 95%;
-      height: 450px;
+      height: 500px;
       background: white;
       border-radius: 15px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
@@ -68,7 +70,6 @@
       padding: 14px;
       text-align: center;
       font-weight: bold;
-      font-size: 16px;
     }
 
     #chatbox {
@@ -101,6 +102,12 @@
       color: #333;
     }
 
+    .timestamp {
+      font-size: 12px;
+      color: gray;
+      margin-top: 4px;
+    }
+
     #userInput {
       border: none;
       border-top: 1px solid #ccc;
@@ -117,32 +124,48 @@
         bottom: 80px;
         right: 10px;
       }
+
+      #chat-button-wrapper {
+        bottom: 15px;
+        right: 15px;
+        padding: 6px 10px;
+      }
+
+      #chat-label {
+        font-size: 14px;
+      }
+
+      #chat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        line-height: 40px;
+      }
     }
   </style>
 </head>
 <body>
 
+<!-- Button -->
 <div id="chat-button-wrapper" onclick="toggleChat()">
   <div id="chat-label">CHAT 👋</div>
   <div id="chat-icon">💬</div>
 </div>
 
+<!-- Chat UI -->
 <div id="chat-container">
-  <div id="chat-header">RED STAR TRAVEL<br><small>Ask your travel query</small></div>
+  <div id="chat-header">RED STAR BOT<br><small>Ask your travel query</small></div>
   <div id="chatbox"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
 </div>
-
-<!-- Notification Sound -->
-<audio id="notifSound">
-  <source src="https://www.myinstants.com/media/sounds/pop-up-kun.mp3" type="audio/mpeg">
-</audio>
 
 <script>
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
-  const notifSound = document.getElementById("notifSound");
+
+  // 🔔 Sound effect
+  const notificationSound = new Audio("https://www.myinstants.com/media/sounds/pop-up-kortal.mp3");
 
   function toggleChat() {
     chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
@@ -153,22 +176,30 @@
       const msg = input.value.trim();
       appendMessage("user", msg);
       input.value = "";
-      appendMessage("bot", "<em style='color:gray;'>Red Star is typing...</em>");
+      appendMessage("bot", "Typing...");
 
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          chatbox.lastChild.remove(); // remove "typing"
+          chatbox.lastChild.remove(); // remove "Typing..."
           appendMessage("bot", data.reply);
-          notifSound.play();
+          notificationSound.play(); // 🔔 Play sound
         });
     }
   });
 
+  function getCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `Today, ${hours}:${minutes}`;
+  }
+
   function appendMessage(role, text) {
     const div = document.createElement("div");
     div.className = `message ${role}`;
-    div.innerHTML = `<strong>${role === "user" ? "You" : "Red Star"}:</strong> ${text}`;
+    div.innerHTML = `<strong>${role === "user" ? "You" : "Red Star Bot"}:</strong> ${text}
+                     <div class="timestamp">${getCurrentTime()}</div>`;
     chatbox.appendChild(div);
     chatbox.scrollTop = chatbox.scrollHeight;
   }
