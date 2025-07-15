@@ -2,72 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RED STAR BOT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
     }
 
-    #chat-icon {
+    /* Floating chat button like screenshot */
+    #chat-button-wrapper {
       position: fixed;
       bottom: 25px;
       right: 25px;
-      background: linear-gradient(135deg, #FF416C, #FF4B2B);
-      color: white;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 28px;
-      line-height: 60px;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
       z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: white;
+      padding: 8px 12px;
+      border-radius: 40px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
       transition: transform 0.3s ease;
     }
 
-    #chat-icon:hover {
-      transform: scale(1.1);
+    #chat-button-wrapper:hover {
+      transform: scale(1.03);
     }
 
+    #chat-icon {
+      background: linear-gradient(135deg, #FF416C, #FF4B2B);
+      color: white;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 22px;
+      line-height: 45px;
+      text-align: center;
+    }
+
+    #chat-label {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* Chat container */
     #chat-container {
-      position: fixed;
-      bottom: 100px;
-      right: 25px;
-      width: 350px;
-      max-width: 95%;
-      height: 480px;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 25px;
+      width: 360px;
+      max-width: 95%;
+      height: 500px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
       flex-direction: column;
-      animation: slideUp 0.3s ease forwards;
+      overflow: hidden;
       z-index: 9998;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     #chat-header {
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
-      padding: 16px;
+      padding: 14px;
       text-align: center;
-      font-size: 16px;
       font-weight: bold;
     }
 
     #chatbox {
       flex: 1;
       padding: 12px;
+      background: #f9f9f9;
       overflow-y: auto;
-      background-color: #fafafa;
       font-size: 14px;
       display: flex;
       flex-direction: column;
@@ -75,7 +84,7 @@
 
     .message {
       margin: 6px 0;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border-radius: 12px;
       max-width: 80%;
       word-wrap: break-word;
@@ -89,80 +98,85 @@
 
     .bot {
       align-self: flex-start;
-      background: #f1f1f1;
+      background: #eee;
       color: #333;
     }
 
     #userInput {
       border: none;
-      border-top: 1px solid #ddd;
-      padding: 12px;
+      border-top: 1px solid #ccc;
+      padding: 10px;
       font-size: 14px;
       width: 100%;
-      box-sizing: border-box;
       outline: none;
     }
 
-    #typing-indicator {
-      font-style: italic;
-      color: #888;
-      font-size: 12px;
-      padding-left: 10px;
-      display: none;
-    }
-
-    @media (max-width: 500px) {
+    @media (max-width: 480px) {
       #chat-container {
         width: 95%;
-        height: 450px;
-        right: 10px;
+        height: 90vh;
         bottom: 80px;
+        right: 10px;
+      }
+
+      #chat-button-wrapper {
+        bottom: 15px;
+        right: 15px;
+        padding: 6px 10px;
+      }
+
+      #chat-label {
+        font-size: 14px;
       }
 
       #chat-icon {
-        right: 15px;
-        bottom: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        line-height: 40px;
       }
     }
   </style>
 </head>
 <body>
 
-<div id="chat-icon" title="Chat with us">💬</div>
+<!-- Button with icon and label like screenshot -->
+<div id="chat-button-wrapper" onclick="toggleChat()">
+  <div id="chat-label">CHAT 👋</div>
+  <div id="chat-icon">💬</div>
+</div>
 
+<!-- Hidden chat container -->
 <div id="chat-container">
-  <div id="chat-header">Hi there 👋<br><small>Ask me anything</small></div>
-  <div id="chatbox">
-    <div id="typing-indicator">Bot is typing...</div>
-  </div>
+  <div id="chat-header">RED STAR BOT<br><small>Ask your travel query</small></div>
+  <div id="chatbox"></div>
   <input id="userInput" type="text" placeholder="Type your message..." />
 </div>
 
 <script>
-  const chatIcon = document.getElementById("chat-icon");
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
-  const typing = document.getElementById("typing-indicator");
 
-  let isOpen = false;
+  function toggleChat() {
+    if (chatContainer.style.display === "flex") {
+      chatContainer.style.display = "none";
+    } else {
+      chatContainer.style.display = "flex";
+    }
+  }
 
-  chatIcon.onclick = () => {
-    isOpen = !isOpen;
-    chatContainer.style.display = isOpen ? "flex" : "none";
-  };
-
-  input.addEventListener("keypress", function (e) {
+  input.addEventListener("keypress", function(e) {
     if (e.key === "Enter" && input.value.trim() !== "") {
-      const msg = input.value;
+      const msg = input.value.trim();
       appendMessage("user", msg);
       input.value = "";
+      appendMessage("bot", "Typing...");
 
-      typing.style.display = "block";
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          typing.style.display = "none";
+          chatbox.lastChild.remove();
           appendMessage("bot", data.reply);
         });
     }
