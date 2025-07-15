@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RED STAR BOT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      font-family: 'Segoe UI', sans-serif;
       background: #f5f5f5;
     }
 
@@ -38,11 +38,11 @@
       bottom: 100px;
       right: 25px;
       width: 350px;
-      height: 500px;
+      max-width: 95%;
+      height: 480px;
       background: #fff;
       border-radius: 15px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-      overflow: hidden;
       display: none;
       flex-direction: column;
       animation: slideUp 0.3s ease forwards;
@@ -58,21 +58,9 @@
       background: linear-gradient(135deg, #FF416C, #FF4B2B);
       color: white;
       padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    #chat-header img {
-      height: 30px;
-    }
-
-    #chat-header span {
-      font-weight: bold;
-      font-size: 16px;
-      flex: 1;
       text-align: center;
-      margin-left: -30px;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     #chatbox {
@@ -105,14 +93,6 @@
       color: #333;
     }
 
-    #typing-indicator {
-      font-style: italic;
-      font-size: 12px;
-      margin: 4px 0;
-      color: #666;
-      display: none;
-    }
-
     #userInput {
       border: none;
       border-top: 1px solid #ddd;
@@ -123,28 +103,36 @@
       outline: none;
     }
 
-    @media (max-width: 400px) {
+    #typing-indicator {
+      font-style: italic;
+      color: #888;
+      font-size: 12px;
+      padding-left: 10px;
+      display: none;
+    }
+
+    @media (max-width: 500px) {
       #chat-container {
         width: 95%;
+        height: 450px;
         right: 10px;
         bottom: 80px;
+      }
+
+      #chat-icon {
+        right: 15px;
+        bottom: 15px;
       }
     }
   </style>
 </head>
 <body>
 
-<!-- 💬 Floating Chat Icon -->
 <div id="chat-icon" title="Chat with us">💬</div>
 
-<!-- 🪟 Chat Window -->
 <div id="chat-container">
-  <div id="chat-header">
-    <img src="https://redstartravels.co/static/images/logo.png" alt="Logo" />
-    <span>Red Star Bot</span>
-  </div>
+  <div id="chat-header">Hi there 👋<br><small>Ask me anything</small></div>
   <div id="chatbox">
-    <div class="message bot"><strong>Bot:</strong> Hello! 👋 Did you need any help?</div>
     <div id="typing-indicator">Bot is typing...</div>
   </div>
   <input id="userInput" type="text" placeholder="Type your message..." />
@@ -155,7 +143,7 @@
   const chatContainer = document.getElementById("chat-container");
   const input = document.getElementById("userInput");
   const chatbox = document.getElementById("chatbox");
-  const typingIndicator = document.getElementById("typing-indicator");
+  const typing = document.getElementById("typing-indicator");
 
   let isOpen = false;
 
@@ -170,13 +158,12 @@
       appendMessage("user", msg);
       input.value = "";
 
-      typingIndicator.style.display = "block";
-
+      typing.style.display = "block";
       fetch(`/get?msg=${encodeURIComponent(msg)}`)
         .then(res => res.json())
         .then(data => {
-          typingIndicator.style.display = "none";
-          appendMessage("bot", linkify(data.reply));
+          typing.style.display = "none";
+          appendMessage("bot", data.reply);
         });
     }
   });
@@ -187,13 +174,6 @@
     div.innerHTML = `<strong>${role === "user" ? "You" : "Bot"}:</strong> ${text}`;
     chatbox.appendChild(div);
     chatbox.scrollTop = chatbox.scrollHeight;
-  }
-
-  function linkify(text) {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    return text.replace(urlRegex, function(url) {
-      return `<a href="${url}" target="_blank">${url}</a>`;
-    });
   }
 </script>
 
